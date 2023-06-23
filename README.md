@@ -4,7 +4,7 @@
 
 `@shutterstock/chunker` calls a blocking async callback _before_ adding an item that would exceed a user-defined size limit OR when the count of items limit is reached.
 
-A common use case for `@shutterstock/chunker` is as a "batch accumulator" that gathers up items to be processed in a batch where the batch has specific count and size constraints that must be followed.  For example, sending batches to an AWS Kinesis Data Stream requires that there be 500 or less records totalling 500 MB or less in size.  The record count part is easy, but the record size check and handling both is more difficult.
+A common use case for `@shutterstock/chunker` is as a "batch accumulator" that gathers up items to be processed in a batch where the batch has specific count and size constraints that must be followed.  For example, sending batches to an AWS Kinesis Data Stream requires that there be 500 or less records totalling 5 MB or less in size (see [AWS Kinesis PutRecords](https://docs.aws.amazon.com/kinesis/latest/APIReference/API_PutRecords.html)) .  The record count part is easy, but the record size check and handling both is more difficult.
 
 # Getting Started
 
