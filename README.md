@@ -45,11 +45,12 @@ See below for an example of using `Chunker` to write batches of records to an AW
 ### aws-kinesis-writer
 
 1. Create Kinesis Data Stream using AWS Console or any other method
-   1. Default name is `chunker-test-stream`
-   2. 1 shard is sufficient
-   3. 1 day retention is sufficient
-   4. No encryption is sufficient
-   5. On-demand throughput is sufficient
+   1. Example: `aws kinesis create-stream --stream-name chunker-test-stream --shard-count 1`
+   2. Default name is `chunker-test-stream`
+   3. 1 shard is sufficient
+   4. 1 day retention is sufficient
+   5. No encryption is sufficient
+   6. On-demand throughput is sufficient
 2. `npm run example:aws-kinesis-writer`
    1. If the stream name was changed: `KINESIS_STREAM_NAME=my-stream-name npm run example:aws-kinesis-writer`
 3. Observe in the log output that the `enqueue` method intermittently blocks when the count or size constraints would be breached.  During the block the records are written to the Kinesis Data Stream, after which the block is released and the new item is added to the next batch.
