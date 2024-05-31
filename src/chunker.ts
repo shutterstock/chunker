@@ -22,6 +22,33 @@ export type WriterFunc<T> = (items: T[]) => Promise<void>;
 type Errors = (string | { [key: string]: any } | Error)[];
 
 /**
+ * Options for the Chunker constructor
+ */
+export interface IChunkerOptions<T> {
+  /**
+   * User-defined size before which `writer` should be called
+   */
+  sizeLimit: number;
+
+  /**
+   * Number of pending items requiring that `writer` be called
+   */
+  countLimit: number;
+
+  /**
+   * Function that returns user-defined size of an item
+   */
+  sizer: SizerFunc<T>;
+
+  /**
+   * Function that writes the pending items when `sizeLimit` or `countLimit` would be exceeded.
+   * This is not a `mapper` as it does not return a result at all.
+   * If the results need to be passed along, add them to an `IterableQueueMapper` for example.
+   */
+  writer: WriterFunc<T>;
+}
+
+/**
  * Collects items up to `countLimit`, calling `writer` before `sizeLimit` would be exceeded.
  *
  * @remarks
@@ -39,25 +66,23 @@ export class Chunker<T> {
   private readonly _backgroundWriter: Promise<void>;
 
   /**
-   * Creates a new Chunker instance
+   * Collects items up to `countLimit`, calling `writer` before `sizeLimit` would be exceeded.
+   *
+   * @remarks
+   *
+   * Always call {@link onIdle} when done to ensure that the last `writer` call is made.
    *
    * @template T Type of items to be chunked
-   * @template TResult Type of result returned by `writer`
    * @param options Chunker options
-   * @param options.sizeLimit user-defined size before which `writer` should be called
-   * @param options.countLimit number of pending items requiring that `writer` be called
-   * @param options.sizer function that returns user-defined size of an item
-   * @param options.writer function that writes the pending items when `sizeLimit` or `countLimit`
-   *    would be exceeded.
+   * @param options.sizeLimit User-defined size before (not to exceed) which `writer` should be called
+   * @param options.countLimit User-defined size at which `writer` should be called
+   * @param options.sizer Function that returns user-defined size of an item
+   * @param options.writer Function that writes the pending items when `sizeLimit` or `countLimit` would be exceeded.
    *    This is not a `mapper` as it does not return a result at all.
+   *    For example, this may write the items to a file or send them to a service.
    *    If the results need to be passed along, add them to an `IterableQueueMapper` for example.
    */
-  constructor(options: {
-    sizeLimit: number;
-    countLimit: number;
-    sizer: SizerFunc<T>;
-    writer: WriterFunc<T>;
-  }) {
+  constructor(options: IChunkerOptions<T>) {
     const { sizeLimit, countLimit, sizer, writer } = options;
 
     this._writer = writer;
