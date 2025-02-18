@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
-import * as kinesis from '@aws-sdk/client-kinesis';
+import { KinesisClient, PutRecordsCommand, PutRecordsRequestEntry } from '@aws-sdk/client-kinesis';
 import { Chunker } from '@shutterstock/chunker';
 
-const kinesisClient = new kinesis.KinesisClient({});
+const kinesisClient = new KinesisClient({});
 const { KINESIS_STREAM_NAME = 'chunker-test-stream', RECORDS_TO_WRITE = '1500' } = process.env;
 const RECORDS_TO_WRITE_NUM = parseInt(RECORDS_TO_WRITE, 10);
 
@@ -21,7 +21,7 @@ async function main() {
      * @param record The record to compute the size of
      * @returns
      */
-    sizer: (record: { item: kinesis.PutRecordsRequestEntry; index: number }): number => {
+    sizer: (record: { item: PutRecordsRequestEntry; index: number }): number => {
       const { item, index } = record;
       const itemJSON = JSON.stringify(item);
       // Return the real size of the record if below 500 items
@@ -39,9 +39,7 @@ async function main() {
      * @param records The records to write
      * @returns The result of the Kinesis PutRecordsCommand
      */
-    writer: async (
-      records: { index: number; item: kinesis.PutRecordsRequestEntry }[],
-    ): Promise<void> => {
+    writer: async (records: { index: number; item: PutRecordsRequestEntry }[]): Promise<void> => {
       console.log(
         `Writing to Kinesis - Start - Records: ${records.length}, First Index: ${
           records[0].index
@@ -49,7 +47,7 @@ async function main() {
       );
       // Send the records in a batch since we know we will be under the batch limits
       await kinesisClient.send(
-        new kinesis.PutRecordsCommand({
+        new PutRecordsCommand({
           StreamName: KINESIS_STREAM_NAME,
           Records: records.map((record) => record.item),
         }),
@@ -66,7 +64,7 @@ async function main() {
     for (let i = 0; i < RECORDS_TO_WRITE_NUM; i++) {
       const niceNumberStr = `${i.toString().padStart(5, '0')}`;
       const partitionKey = `${(i % 100).toString().padStart(5, '0')}`;
-      const record: kinesis.PutRecordsRequestEntry = {
+      const record: PutRecordsRequestEntry = {
         Data: Buffer.from(niceNumberStr, 'utf-8'),
         PartitionKey: partitionKey,
       };

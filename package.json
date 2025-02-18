@@ -18,7 +18,7 @@
     "promise"
   ],
   "scripts": {
-    "build": "tsc --build tsconfig.json && echo 'examples/\n*.tsbuildinfo' > dist/.npmignore",
+    "build": "tsc --build tsconfig.json && echo 'examples/\n*.tsbuildinfo\n*.d.ts.map\n*.test.*' > dist/.npmignore",
     "build:docs": "typedoc src/index.ts",
     "example:aws-kinesis-writer": "KINESIS_STREAM_NAME=${KINESIS_STREAM_NAME:-chunker-test-stream} ts-node -r tsconfig-paths/register examples/aws-kinesis-writer.ts",
     "test": "AWS_EMF_ENVIRONMENT=Local jest",
@@ -42,7 +42,7 @@
     "@shutterstock/p-map-iterable": "^1.0.11"
   },
   "devDependencies": {
-    "@aws-sdk/client-kinesis": "3.353.0",
+    "@aws-sdk/client-kinesis": "^3.750.0",
     "@types/jest": "29.5.2",
     "@typescript-eslint/eslint-plugin": "5.59.11",
     "@typescript-eslint/parser": "5.59.11",
